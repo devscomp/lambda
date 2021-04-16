@@ -64,7 +64,7 @@ class AWSComponent {
             properties,
             awsClients,
             region
-        } = await this.handlerInput(inputs);
+        } = await this.handlerInput(inputs, 'deploy');
         const functionName = properties.Function.FunctionName;
 
         const resConfig = {};
@@ -89,7 +89,7 @@ class AWSComponent {
             awsClients,
             properties,
             region
-        } = await this.handlerInput(inputs);
+        } = await this.handlerInput(inputs, 'remove');
 
         const functionName = properties.Function.FunctionName;
         if (!functionName) {
