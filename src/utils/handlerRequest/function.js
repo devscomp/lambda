@@ -120,13 +120,15 @@ class Function {
     Logger.log('Successful compression code.');
 
     try {
-      await this.lambda('getFunction', { FunctionName: functionName });
+      await this.checkStatus(functionName);
       await this.lambda('updateFunctionCode', {
         FunctionName: functionName,
         ZipFile: code.ZipFile
       });
+
       delete functionInput.Code;
       delete functionInput.CodeUri;
+      await this.checkStatus(functionName);
       return await this.lambda('updateFunctionConfiguration', functionInput);
     } catch (e) {
       if (e.code === 'ResourceNotFoundException') {
@@ -134,7 +136,17 @@ class Function {
         delete functionInput.CodeUri;
         return await this.createFunction(functionInput);
       }
-      throw new Error(e.message)
+      throw e;
+    }
+  }
+
+  async checkStatus(FunctionName) {
+    for (let i = 0; i < 10; i++) {
+      const { LastUpdateStatus } = await this.lambda('getFunctionConfiguration', { FunctionName })
+      if (LastUpdateStatus === 'Successful' || LastUpdateStatus === 'Failed') {
+        return true;
+      }
+      await sleep(1500);
     }
   }
   
