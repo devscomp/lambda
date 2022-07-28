@@ -15,209 +15,253 @@ Commands:
   deploy: 部署资源
   remove: 移除资源
 Properties:
-  region:
-    Description: The region of function.
-    Required: true
-    Type:
-      - String
-  function:
-    Description: The config of function.
-    Required: true
-    Type:
-      - Struct:
-          codeUri:
-            Description: The code for the function.
-            Required: true
-            Type:
-              - String
-          name:
-            Description: The name of the Lambda function.
-            Required: true
-            Type:
-              - String
-          description:
-            Description: 描述
-            Required: false
-            Type:
-              - String
-          deadLetterConfig:
-            Description: A dead letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing.
-            Required: false
-            Type:
-              - Struct:
-                  targetArn:
-                    Description: The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.
-                    Required: false
-                    Type:
-                      - String
-          environment:
-            Required: false
-            Description: The function's environment variables.
-            Type:
-              - Struct:
-                  error:
-                    Required: false
-                    Description: Error messages for environment variables that couldn't be applied.
-                    Type:
-                      - Struct:
-                          errorCode:
-                            Required: false
-                            Description: The error code.
-                            Type:
-                              - String
-                          message:
-                            Required: false
-                            Description: The error message.
-                            Type:
-                              - String
-                  variables:
-                    Required: false
-                    Description: Environment variable key-value pairs.
-                    Type:
-                      - List<Struct>:
-                          Key:
-                            Required: false
-                            Description: Environment key.
-                            Type:
-                              - String
-                          Value:
-                            Required: false
-                            Description: Environment value.
-                            Type:
-                              - String
-          tags:
-            Required: false
-            Description: A list of tags to apply to the function.
-            Type:
-              - List<Struct>:
-                  key:
-                    Required: true
-                    Description: Tag key.
-                    Type:
-                      - String
-                  value:
-                    Required: true
-                    Description: Tag value.
-                    Type:
-                      - String
-          fileSystemConfig:
-            Description: Connection settings for an Amazon EFS file system.
-            Required: false
-            Type:
-              - Struct:
-                  arn:
-                    Description: The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.
-                    Required: false
-                    Type:
-                      - String
-                  localMountPath:
-                    Description: The path where the function can access the file system, starting with /mnt/.
-                    Required: false
-                    Type:
-                      - String
-          handler:
-            Description: 入口
-            Required: true
-            Type:
-              - String
-          KMSKeyArn:
-            Description: The ARN of the AWS Key Management Service (AWS KMS) key that's used to encrypt your function's environment variables. If it's not provided, AWS Lambda uses a default service key.
-            Required: false
-            Type:
-              - String
-          layers:
-            Description: A list of function layers to add to the function's execution environment. Specify each layer by its ARN, including the version.
-            Required: false
-            Type:
-              - List<String>
-          runtime:
-            Description: The identifier of the function's runtime.
-            Required: true
-            Type:
-              - String
-          publish:
-            Description: Set to true to publish the first version of the function during creation.
-            Required: true
-            Type:
-              - Boolean
-          memorySize:
-            Description: The amount of memory that your function has access to. Increasing the function's memory also increases its CPU allocation. The default value is 128 MB. The value must be a multiple of 64 MB.
-            Required: false
-            Type:
-              - Number
-          timeout:
-            Description: The amount of time that Lambda allows a function to run before stopping it. The default is 3 seconds. The maximum allowed value is 900 seconds.
-            Required: false
-            Type:
-              - Number
-          tracingConfig:
-            Description: Set Mode to Active to sample and trace a subset of incoming requests with AWS X-Ray.
-            Required: false
-            Type:
-              - Struct:
-                  mode:
-                    Description: The tracing mode.
-                    Required: false
-                    Type:
-                      - String
-          vpcConfig:
-            Description: For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC. When you connect a function to a VPC, it can only access resources and the internet through that VPC.
-            Required: false
-            Type:
-              - Struct:
-                  securityGroupIds:
-                    Description: A list of VPC security groups IDs.
-                    Required: false
-                    Type:
-                      - List<String>
-                  subnetIds:
-                    Description: A list of VPC subnet IDs.
-                    Required: false
-                    Type:
-                      - List<String>
-  events:
-    Description: The events of function.
-    Required: false
-    Type:
-      - List<Struct>:
-          name:
-            Required: true
-            Description: Trigger Name.
-            Type:
-              - String
-          type:
-            Required: true
-            Description: Trigger type.
-            Type:
-              - Enum:
-                  - Api
+  type: object
+  required:
+    - region
+    - function
+  additionalProperties: false
+  properties:
+    region:
+      title: 地域
+      description: The region of function
+      enum:
+        - us-east-2
+        - us-east-1
+        - us-west-1
+        - us-west-2
+        - af-south-1
+        - ap-east-1
+        - ap-southeast-3
+        - ap-south-1
+        - ap-northeast-3
+        - ap-northeast-2
+        - ap-southeast-1
+        - ap-southeast-2
+        - ap-northeast-1
+        - ca-central-1
+        - cn-north-1
+        - cn-northwest-1
+        - eu-central-1
+        - eu-west-1
+        - eu-west-2
+        - eu-south-1
+        - eu-west-3
+        - eu-north-1
+        - me-south-1
+        - sa-east-1
+    function:
+      type: object
+      title: 函数配置
+      description: The config of function
+      additionalProperties: false
+      required:
+        - codeUri
+        - name
+        - handler
+        # - role
+      properties:
+        architectures:
+          title: 指令集架构
+          description: Instruction set architecture supported by function
+          default: x86_64
+          enum:
+            - x86_64
+            - arm64
+        codeUri:
+          title: 代码配置
+          description: The code for the function
+          # TODO: support ImageUri/S3Bucket
+          type: string
+        deadLetterConfig:
+          title: 死信队列
+          description: A dead letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing.
+          type: object
+          additionalProperties: false
           properties:
-            Required: true
-            Description: The properties of event.
-            Type:
-              - Struct:
+            targetArn:
+              title: 资源ARN
+              description: The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic
+              type: string
+        description:
+          title: 描述
+          description: The description of the Lambda function
+          type: string
+        environment:
+          title: 环境变量
+          description: The function's environment variables
+          type: object
+          additionalProperties: false
+          properties:
+            variables:
+              title: 键值对
+              description: Environment variable key-value pairs
+              x-component: KeyValue
+        name:
+          title: 函数名称
+          description: The name of the Lambda function
+          type: string
+        ephemeralStorage:
+          title: tmp目录的大小
+          description: The size (in MB) of the /tmp directory of the function. The original setting value is 512, but it can be any integer between 512 and 10240MB.
+          minimum: 512
+          maximum: 10240
+          default: 512
+          type: integer
+        fileSystemConfigs:
+          title: 文件系统
+          description: Connection settings for Amazon EFS file system
+          type: object
+          additionalProperties: false
+          properties:
+            arn:
+              title: 访问点ARN
+              description: Amazon resource name (ARN) of the Amazon EFS access point that provides access to the file system
+              type: string
+            localMountPath:
+              title: 函数路径
+              description: Function is used to access the path of the file system, starting with /mnt/
+              type: string
+        handler:
+          title: 函数入口
+          description: ''
+          type: string
+        layers:
+          title: 层配置
+          description: List of function layers to be added to the function execution environment. Specify each layer through ARN, including version.
+          type: array
+          uniqueItems: true
+          items:
+            oneOf:
+              - type: string
+        memorySize:
+          title: 运行内存
+          description: The amount of memory available to the function at run time. Increasing the memory of this function will also increase its CPU allocation. The default value is 128 MB. This value can be any multiple of 1 MB.
+          type: integer
+          minimum: 128
+          maximum: 10240
+          default: 128
+        role:
+          title: 执行角色
+          description: Amazon resource name (ARN) of the execution role of the function
+          type: string
+        runtime:
+          title: 运行时
+          description: Identifier of the runtime of the function. If the deployment package is a.Zip file archive, you need to use the runtime
+          enum:
+            # - nodejs4.3
+            - nodejs6.10
+            - nodejs8.10
+            - nodejs10.x
+            - nodejs12.x
+            - nodejs14.x
+            - nodejs16.x
+            - java8
+            - java8.al2
+            - java11
+            - python2.7
+            - python3.6
+            - python3.7
+            - python3.8
+            - python3.9
+            - dotnetcore1.0
+            - dotnetcore2.0
+            - dotnetcore2.1
+            - dotnetcore3.1
+            - dotnet6
+            - nodejs4.3-edge
+            - go1.x
+            - ruby2.5
+            - ruby2.7
+            - provided
+            - provided.al2
+        tags:
+          title: 标签配置
+          description: A list of tags to apply to the function.
+          x-component: KeyValue
+        timeout:
+          title: 运行时长
+          description: The length of time (in seconds) that lambda allows a function to run before stopping it. The default value is 3 seconds. The maximum allowed value is 900 seconds
+          type: integer
+          minimum: 1
+          maximum: 900
+          default: 3
+        tracingConfig:
+          title: 链路跟踪
+          description: ''
+          type: object
+          additionalProperties: false
+          properties:
+            mode:
+              title: 跟踪模式
+              enum:
+                - Active
+                - PassThrough
+        vpcConfig:
+          title: 网络连接
+          description: ''
+          type: object
+          additionalProperties: false
+          properties:
+            securityGroupIds:
+              title: 安全组 ID
+              type: array
+              uniqueItems: true
+              items:
+                oneOf:
+                  - type: string
+            subnetIds:
+              title: 子网 ID
+              type: array
+              uniqueItems: true
+              items:
+                oneOf:
+                  - type: string
+    events:
+      type: array
+      title: 触发事件配置
+      description: The events of function
+      uniqueItems: true
+      items:
+        oneOf:
+          - type: object
+            required:
+              - type
+              - name
+              - properties
+            properties:
+              name:
+                title: 触发事件名称
+                type: string
+              type:
+                title: 触发事件类型
+                default: Api
+                enum:
+                  - Api
+              properties:
+                title: 事件属性
+                type: object
+                required:
+                  - path
+                  - method
+                properties:
                   path:
-                    Required: true
-                    Description: The path of apigateway event.
-                    Type:
-                      - String
+                    title: 事件路径
+                    type: string
+                    description: The path of apigateway event
                   method:
-                    Required: true
-                    Description: The Method of apigateway event.
-                    Type:
-                      - Enum:
-                          - ANY
-                          - GET
-                          - POST
-                          - DELETE
-                          - PUT
+                    title: 调用方式
+                    description: The Method of apigateway event
+                    enum:
+                      - ANY
+                      - GET
+                      - POST
+                      - DELETE
+                      - PUT
                   timeoutInMillis:
-                    Required: false
-                    Description: The TimeoutInMillis of apigateway event.
-                    Type:
-                      - String
+                    title: 时间单位
+                    type: string
+                    description: The TimeoutInMillis of apigateway event
                   payloadFormatVersion:
-                    Required: false
-                    Description: The PayloadFormatVersion of apigateway event.
-                    Type:
-                      - String
+                    title: 有效负载格式版本
+                    type: string
+                    description: The PayloadFormatVersion of apigateway event

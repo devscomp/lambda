@@ -1,15 +1,10 @@
-const { Logger, getCredential, reportComponent } = require('@serverless-devs/core');
+const { Logger, getCredential } = require('@serverless-devs/core');
 const AWSClient = require('./utils/getClient');
 const {upperFirst} = require('./utils/utils');
 const {Function, EventSource} = require('./utils/handlerRequest');
 
 class AWSComponent {
-    async handlerInput(inputs, command) {
-        reportComponent('lambda', {
-            command,
-            uid: '',
-            remark: 'AWS'
-        });
+    async handlerInput(inputs) {
         const credentials = await getCredential(inputs.project.access);
         if (!(credentials.AccessKeyID || credentials.SecretAccessKey)) {
             const msg = `credentials not found. `
@@ -64,7 +59,7 @@ class AWSComponent {
             properties,
             awsClients,
             region
-        } = await this.handlerInput(inputs, 'deploy');
+        } = await this.handlerInput(inputs);
         const functionName = properties.Function.FunctionName;
 
         const resConfig = {};
@@ -89,7 +84,7 @@ class AWSComponent {
             awsClients,
             properties,
             region
-        } = await this.handlerInput(inputs, 'remove');
+        } = await this.handlerInput(inputs);
 
         const functionName = properties.Function.FunctionName;
         if (!functionName) {
