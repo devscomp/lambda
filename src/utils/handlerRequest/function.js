@@ -94,8 +94,8 @@ class Function {
     if (!functionInput.Role) {
       retry = 5;
       functionInput.Role = await this.createRole(functionName);
-      Logger.log('Start trying to create functions after 6 seconds of sleep.', 'yellow');
-      await sleep(6000);
+      Logger.log('Start trying to create functions after 10 seconds of sleep.', 'yellow');
+      await sleep(10 * 1000);
     }
 
     try {

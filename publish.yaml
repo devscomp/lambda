@@ -2,7 +2,7 @@ Type: Component
 Name: devscomp/lambda
 Provider:
   - AWS
-Version: 1.0.1
+Version: 1.0.2
 Description: 快速部署 Lambda 到 AWS
 HomePage: https://github.com/Serverless-Devs-Awesome/lambda-aws-component
 Tags:
