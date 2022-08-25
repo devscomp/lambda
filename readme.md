@@ -5,23 +5,27 @@
 ### template.yaml
 
 ````
-MyFunctionDemo:
-  Component: lambda
-  Provider: aws
-  Properties:
-    Region: ap-southeast-1
-    Function:
-      CodeUri: ./index.js
-      Name: aws-lambda-dome
-      Handler: index.handler
-      Runtime: nodejs12.x
-      Description: 测试的
-    Events:
-      - Name: triggerName
-        Type: Api
-        Properties:
-          Path: /dome
-          Method: ANY
+edition: 1.0.0          #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+name: functionApp       #  项目名称
+access: aws   #  秘钥别名
+
+services:
+  function-test: #  服务名称
+    component: devscomp/lambda  # 组件名称
+    props: #  组件的属性值
+      region: ap-southeast-1
+      function:
+        codeUri: ./index.js
+        name: aws-lambda-dome
+        handler: index.handler
+        runtime: nodejs12.x
+        description: Test
+      events:
+        - name: api-sdk
+          type: Api
+          properties:
+            path: /test/test
+            method: ANY
 
 ````
 > Function 属性可参照： https://docs.aws.amazon.com/zh_cn/lambda/latest/dg/API_CreateFunction.html#API_CreateFunction_RequestBody
